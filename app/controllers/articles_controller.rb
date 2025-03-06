@@ -10,10 +10,7 @@ class ArticlesController < ApplicationController
   end
 
   def show
-    respond_to do |format|
-      format.html
-      format.json { render json: @article }
-    end
+    render json: @article
   end
 
   def create
@@ -26,10 +23,28 @@ class ArticlesController < ApplicationController
     end
   end
 
+  def update
+    if @article.update(article_params)
+      render json: @article, status: :ok
+    else
+      render json: { errors: @article.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    if @article.destroy
+      render json: { message: "Article deleted successfully!" }, status: :ok
+    else
+      render json: { error: "Failed to delete article." }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def set_article
     @article = Article.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: "Article not found." }, status: :not_found
   end
 
   def article_params

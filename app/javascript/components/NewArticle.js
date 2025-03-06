@@ -7,9 +7,35 @@ class NewArticle extends React.Component {
     this.state = {
       title: "",
       content: "",
-      errors: ""
+      errors: "",
+      isEditing: false, // Track editing mode
+      articleId: null, // Store article ID when editing
     };
   }
+
+  componentDidMount() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const articleId = urlParams.get("id");
+
+    if (articleId) {
+      this.fetchArticle(articleId);
+    }
+  }
+
+  fetchArticle = async (id) => {
+    try {
+      const response = await fetch(`/articles/${id}.json`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch article details.");
+      }
+
+      this.setState({ title: data.title, content: data.content, isEditing: true, articleId: id });
+    } catch (error) {
+      this.setState({ errors: error.message });
+    }
+  };
 
   handleChange = (event) => {
     this.setState({ [event.target.name]: event.target.value, errors: "" });
@@ -17,16 +43,19 @@ class NewArticle extends React.Component {
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    const { title, content } = this.state;
+    const { title, content, isEditing, articleId } = this.state;
 
     if (title.trim() === "" || content.trim() === "") {
       this.setState({ errors: "Title and content cannot be empty." });
       return;
     }
 
+    const url = isEditing ? `/articles/${articleId}` : "/articles";
+    const method = isEditing ? "PATCH" : "POST";
+
     try {
-      const response = await fetch("/articles", {
-        method: "POST",
+      const response = await fetch(url, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
           "X-CSRF-Token": document.querySelector("meta[name='csrf-token']").getAttribute("content"),
@@ -37,24 +66,24 @@ class NewArticle extends React.Component {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.errors.join(", "));
+        throw new Error(data.errors?.join(", ") || "Failed to save article.");
       }
 
-      alert("Article created successfully!");
-      this.setState({ title: "", content: "", errors: "" }); // Clear form
+      alert(isEditing ? "Article updated successfully!" : "Article created successfully!");
+      window.location.href = "/";
     } catch (error) {
       this.setState({ errors: error.message });
     }
   };
 
   handleBack = () => {
-    window.location.href = "http://localhost:3000";
+    window.location.href = "/";
   };
 
   render() {
     return (
       <React.Fragment>
-        <h2>Create New Article</h2>
+        <h2>{this.state.isEditing ? "Edit Article" : "Create New Article"}</h2>
         {this.state.errors && <p style={{ color: "red" }}>{this.state.errors}</p>}
         <form onSubmit={this.handleSubmit}>
           <div>
@@ -74,7 +103,7 @@ class NewArticle extends React.Component {
               onChange={this.handleChange} 
             />
           </div>
-          <button type="submit">Submit</button>
+          <button type="submit">{this.state.isEditing ? "Update" : "Submit"}</button>
         </form>
         <button onClick={this.handleBack} style={{ marginTop: "10px" }}>Back</button>
       </React.Fragment>
@@ -84,7 +113,7 @@ class NewArticle extends React.Component {
 
 NewArticle.propTypes = {
   title: PropTypes.string,
-  content: PropTypes.string
+  content: PropTypes.string,
 };
 
 export default NewArticle;
