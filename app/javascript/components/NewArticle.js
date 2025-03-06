@@ -82,31 +82,47 @@ class NewArticle extends React.Component {
 
   render() {
     return (
-      <React.Fragment>
-        <h2>{this.state.isEditing ? "Edit Article" : "Create New Article"}</h2>
-        {this.state.errors && <p style={{ color: "red" }}>{this.state.errors}</p>}
-        <form onSubmit={this.handleSubmit}>
+      <div className="max-w-lg mx-auto mt-10 p-6 bg-white shadow-md rounded-md">
+        <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+          {this.state.isEditing ? "Edit Article" : "Create New Article"}
+        </h2>
+        {this.state.errors && <p className="text-red-500 mb-4">{this.state.errors}</p>}
+        
+        <form onSubmit={this.handleSubmit} className="space-y-4">
           <div>
-            <label>Title:</label>
+            <label className="block text-gray-700 font-medium">Title:</label>
             <input 
               type="text" 
               name="title" 
               value={this.state.title} 
               onChange={this.handleChange} 
+              className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300"
             />
           </div>
           <div>
-            <label>Content:</label>
+            <label className="block text-gray-700 font-medium">Content:</label>
             <textarea 
               name="content" 
               value={this.state.content} 
               onChange={this.handleChange} 
+              className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300"
             />
           </div>
-          <button type="submit">{this.state.isEditing ? "Update" : "Submit"}</button>
+          <button 
+            type="submit" 
+            className="w-full py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600"
+          >
+            {this.state.isEditing ? "Update" : "Submit"}
+          </button>
         </form>
-        <button onClick={this.handleBack} style={{ marginTop: "10px" }}>Back</button>
-      </React.Fragment>
+        
+        <button 
+          onClick={this.handleBack} 
+          className="w-full mt-4 py-2 bg-gray-500 text-white font-semibold rounded-md hover:bg-gray-600"
+        >
+          Back
+        </button>
+      </div>
     );
   }
 }
