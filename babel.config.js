@@ -1,18 +1,18 @@
-module.exports = function(api) {
-  var validEnv = ['development', 'test', 'production']
-  var currentEnv = api.env()
-  var isDevelopmentEnv = api.env('development')
-  var isProductionEnv = api.env('production')
-  var isTestEnv = api.env('test')
+module.exports = function (api) {
+  var validEnv = ['development', 'test', 'production'];
+  var currentEnv = api.env();
+  var isDevelopmentEnv = api.env('development');
+  var isProductionEnv = api.env('production');
+  var isTestEnv = api.env('test');
 
   if (!validEnv.includes(currentEnv)) {
     throw new Error(
       'Please specify a valid `NODE_ENV` or ' +
-        '`BABEL_ENV` environment variables. Valid values are "development", ' +
+        '`BABEL_ENV` environment variable. Valid values are "development", ' +
         '"test", and "production". Instead, received: ' +
         JSON.stringify(currentEnv) +
         '.'
-    )
+    );
   }
 
   return {
@@ -24,8 +24,7 @@ module.exports = function(api) {
             node: 'current'
           },
           modules: 'commonjs'
-        },
-        '@babel/preset-react'
+        }
       ],
       (isProductionEnv || isDevelopmentEnv) && [
         '@babel/preset-env',
@@ -40,6 +39,7 @@ module.exports = function(api) {
       [
         '@babel/preset-react',
         {
+          runtime: 'automatic', // Enable the new JSX transform
           development: isDevelopmentEnv || isTestEnv,
           useBuiltIns: true
         }
@@ -76,6 +76,18 @@ module.exports = function(api) {
           async: false
         }
       ],
+      [
+        '@babel/plugin-transform-private-methods',
+        {
+          loose: true
+        }
+      ],
+      [
+        '@babel/plugin-transform-private-property-in-object',
+        {
+          loose: true
+        }
+      ],
       isProductionEnv && [
         'babel-plugin-transform-react-remove-prop-types',
         {
@@ -83,5 +95,5 @@ module.exports = function(api) {
         }
       ]
     ].filter(Boolean)
-  }
-}
+  };
+};

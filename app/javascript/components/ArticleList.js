@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import WarningMessage from "./WarningMessage";
+import Swal from "sweetalert2";
 
 class ArticleList extends React.Component {
   constructor(props) {
@@ -8,8 +8,6 @@ class ArticleList extends React.Component {
     this.state = {
       articles: [],
       error: "",
-      warningMessage: "",
-      articleToDelete: null,
     };
   }
 
@@ -29,6 +27,7 @@ class ArticleList extends React.Component {
       this.setState({ articles: data });
     } catch (error) {
       this.setState({ error: error.message });
+      Swal.fire("Error", error.message, "error");
     }
   };
 
@@ -40,59 +39,44 @@ class ArticleList extends React.Component {
     window.location.href = `/articles/new?id=${id}`;
   };
 
-  handleDelete = (id) => {
-    this.setState({
-      warningMessage: "Are you sure you want to delete this article?",
-      articleToDelete: id,
+  handleDelete = async (id) => {
+    const result = await Swal.fire({
+      title: "Do you want to delete this article?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes",
     });
-  };
 
-  confirmDelete = async () => {
-    const { articleToDelete } = this.state;
-    if (!articleToDelete) return;
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(`/articles/${id}`, {
+          method: "DELETE",
+          headers: {
+            "X-CSRF-Token": document.querySelector("meta[name='csrf-token']").getAttribute("content"),
+          },
+        });
 
-    try {
-      const response = await fetch(`/articles/${articleToDelete}`, {
-        method: "DELETE",
-        headers: {
-          "X-CSRF-Token": document.querySelector("meta[name='csrf-token']").getAttribute("content"),
-        },
-      });
+        if (!response.ok) {
+          throw new Error("Failed to delete article.");
+        }
 
-      if (!response.ok) {
-        throw new Error("Failed to delete article.");
+        Swal.fire("Deleted!", "Your article has been deleted.", "success");
+        this.fetchArticles();
+      } catch (error) {
+        this.setState({ error: error.message });
+        Swal.fire("Error!", "Failed to delete article.", "error");
       }
-
-      this.setState({ warningMessage: "", articleToDelete: null });
-      alert("Article deleted successfully!");
-      this.fetchArticles();
-    } catch (error) {
-      this.setState({ error: error.message, warningMessage: "", articleToDelete: null });
     }
-  };
-
-  cancelWarning = () => {
-    this.setState({ warningMessage: "", articleToDelete: null });
   };
 
   render() {
     return (
       <div className="max-w-3xl mx-auto mt-10">
-        {/* Display Warning Message Outside the Box */}
-        {this.state.warningMessage && (
-          <div className="mb-4">
-            <WarningMessage
-              message={this.state.warningMessage}
-              onConfirm={this.confirmDelete}
-              onCancel={this.cancelWarning}
-            />
-          </div>
-        )}
-
         <div className="p-6 bg-white shadow-md rounded-md">
           <h2 className="text-2xl font-semibold mb-4 text-gray-800">Article List</h2>
-
-          {this.state.error && <p className="text-red-500 mb-4">{this.state.error}</p>}
 
           <button 
             onClick={this.handleCreate} 
