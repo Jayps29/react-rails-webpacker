@@ -8,8 +8,8 @@ class NewArticle extends React.Component {
       title: "",
       content: "",
       errors: "",
-      isEditing: false, // Track editing mode
-      articleId: null, // Store article ID when editing
+      isEditing: false, 
+      articleId: null, 
     };
   }
 
