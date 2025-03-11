@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import Swal from "sweetalert2";
 
 class NewArticle extends React.Component {
   constructor(props) {
@@ -34,6 +35,7 @@ class NewArticle extends React.Component {
       this.setState({ title: data.title, content: data.content, isEditing: true, articleId: id });
     } catch (error) {
       this.setState({ errors: error.message });
+      Swal.fire("Error", error.message, "error");
     }
   };
 
@@ -45,8 +47,14 @@ class NewArticle extends React.Component {
     event.preventDefault();
     const { title, content, isEditing, articleId } = this.state;
 
-    if (title.trim() === "" || content.trim() === "") {
-      this.setState({ errors: "Title and content cannot be empty." });
+    if (title.trim() === "" && content.trim() === "") {
+      Swal.fire("Error", "Cannot post empty title and content article.", "error");
+      return;
+    } else if (title.trim() === "") {
+      Swal.fire("Error", "Cannot post empty title article.", "error");
+      return;
+    } else if (content.trim() === "") {
+      Swal.fire("Error", "Cannot post empty content article.", "error");
       return;
     }
 
@@ -69,10 +77,12 @@ class NewArticle extends React.Component {
         throw new Error(data.errors?.join(", ") || "Failed to save article.");
       }
 
-      alert(isEditing ? "Article updated successfully!" : "Article created successfully!");
-      window.location.href = "/";
+      Swal.fire("Success", isEditing ? "Article updated successfully!" : "Article created successfully!", "success").then(() => {
+        window.location.href = "/";
+      });
     } catch (error) {
       this.setState({ errors: error.message });
+      Swal.fire("Error", error.message, "error");
     }
   };
 
@@ -82,31 +92,44 @@ class NewArticle extends React.Component {
 
   render() {
     return (
-      <React.Fragment>
-        <h2>{this.state.isEditing ? "Edit Article" : "Create New Article"}</h2>
-        {this.state.errors && <p style={{ color: "red" }}>{this.state.errors}</p>}
-        <form onSubmit={this.handleSubmit}>
+      <div className="max-w-lg mx-auto mt-10 p-6 bg-white shadow-md rounded-md">
+        <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+          {this.state.isEditing ? "Edit Article" : "Create New Article"}
+        </h2>
+        <form onSubmit={this.handleSubmit} className="space-y-4">
           <div>
-            <label>Title:</label>
+            <label className="block text-gray-700 font-medium">Title:</label>
             <input 
               type="text" 
               name="title" 
               value={this.state.title} 
               onChange={this.handleChange} 
+              className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300"
             />
           </div>
           <div>
-            <label>Content:</label>
+            <label className="block text-gray-700 font-medium">Content:</label>
             <textarea 
               name="content" 
               value={this.state.content} 
               onChange={this.handleChange} 
+              className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300"
             />
           </div>
-          <button type="submit">{this.state.isEditing ? "Update" : "Submit"}</button>
+          <button 
+            type="submit" 
+            className="w-full py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600"
+          >
+            {this.state.isEditing ? "Update" : "Submit"}
+          </button>
         </form>
-        <button onClick={this.handleBack} style={{ marginTop: "10px" }}>Back</button>
-      </React.Fragment>
+        <button 
+          onClick={this.handleBack} 
+          className="w-full mt-4 py-2 bg-gray-500 text-white font-semibold rounded-md hover:bg-gray-600"
+        >
+          Back
+        </button>
+      </div>
     );
   }
 }
