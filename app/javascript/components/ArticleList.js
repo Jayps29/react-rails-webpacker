@@ -8,12 +8,29 @@ class ArticleList extends React.Component {
     this.state = {
       articles: [],
       error: "",
+      user: null, // To store user authentication state
     };
   }
 
   componentDidMount() {
-    this.fetchArticles();
+    this.checkAuthentication();
   }
+
+  checkAuthentication = async () => {
+    try {
+      const response = await fetch("/users/current", { credentials: "include" });
+      const data = await response.json();
+
+      if (!data.signed_in) {
+        window.location.href = "/users/sign_in"; // Redirect to login if not authenticated
+      } else {
+        this.setState({ user: data.user });
+        this.fetchArticles();
+      }
+    } catch (error) {
+      console.error("Authentication check failed:", error);
+    }
+  };
 
   fetchArticles = async () => {
     try {

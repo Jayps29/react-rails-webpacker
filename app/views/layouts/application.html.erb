@@ -5,16 +5,24 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <meta name="notice-message" content="<%= j notice.to_s %>">
+    <meta name="alert-message" content="<%= j alert.to_s %>">
+
     <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_pack_tag 'sweet_alert' %>
     <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
   </head>
 
   <body>
-    <div id="header">
-      <%= react_component("Header", {}) %>
-    </div>
-    
+
+
+    <% if user_signed_in? %>
+      <div id="header">
+        <%= react_component("Header", { user: current_user }) %>
+      </div>
+    <% end %>
+
     <%= yield %>
   </body>
 </html>

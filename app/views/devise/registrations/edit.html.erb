@@ -1,0 +1,83 @@
+<div class="pt-10">
+  <h2 class="text-2xl font-semibold text-gray-800 text-center mb-4">
+    Edit <%= resource_name.to_s.humanize %>
+  </h2>
+
+  <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "bg-white p-6 rounded-lg shadow-md max-w-md mx-auto" }) do |f| %>
+    <%= render "devise/shared/error_messages", resource: resource %>
+
+    <div class="mb-4">
+      <%= f.label :email, class: "block text-gray-700 font-medium" %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-400 focus:outline-none" %>
+    </div>
+
+    <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+      <div class="text-sm text-yellow-500">
+        Currently waiting confirmation for: <%= resource.unconfirmed_email %>
+      </div>
+    <% end %>
+
+    <div class="mb-4">
+      <%= f.label :password, class: "block text-gray-700 font-medium" %> 
+      <span class="text-sm text-gray-500">(leave blank if you don't want to change it)</span>
+      <%= f.password_field :password, autocomplete: "new-password", class: "w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-400 focus:outline-none" %>
+      <% if @minimum_password_length %>
+        <p class="text-sm text-gray-500 mt-1"><%= @minimum_password_length %> characters minimum</p>
+      <% end %>
+    </div>
+
+    <div class="mb-4">
+      <%= f.label :password_confirmation, class: "block text-gray-700 font-medium" %>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-400 focus:outline-none" %>
+    </div>
+
+    <div class="mb-4">
+      <%= f.label :current_password, class: "block text-gray-700 font-medium" %>
+      <span class="text-sm text-gray-500">(we need your current password to confirm your changes)</span>
+      <%= f.password_field :current_password, autocomplete: "current-password", class: "w-full border border-gray-300 rounded-md px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-400 focus:outline-none" %>
+    </div>
+
+    <div class="mt-6">
+      <%= f.submit "Update", class: "w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600 transition cursor-pointer" %>
+    </div>
+  <% end %>
+
+  <!-- Cancel Account Section -->
+  <div class="mt-8 text-center">
+    <h3 class="text-lg font-semibold text-gray-800">Cancel my account</h3>
+    <p class="text-sm text-gray-500">Unhappy? You can delete your account below.</p>
+
+    <!-- SweetAlert2 Button -->
+    <button id="delete-account-btn" type="button" class="mt-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition cursor-pointer">
+      Cancel my account
+    </button>
+
+    <!-- Hidden Form for Account Deletion -->
+    <form id="delete-account-form" action="<%= registration_path(resource_name) %>" method="post" style="display: none;">
+      <input type="hidden" name="_method" value="delete">
+      <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+    </form>
+  </div>
+
+  <%= link_to "Back", :back, class: "mt-6 inline-block text-blue-500 hover:underline text-sm" %>
+</div>
+
+<!-- SweetAlert2 Script -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  document.getElementById("delete-account-btn").addEventListener("click", function() {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This action cannot be undone!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        document.getElementById("delete-account-form").submit();
+      }
+    });
+  });
+</script>
