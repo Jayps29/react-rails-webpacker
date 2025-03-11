@@ -29,15 +29,17 @@ class ArticleList extends React.Component {
     }
   };
 
+  handleCreate = () => {
+    window.location.href = "/articles/new";
+  };
+
   handleEdit = (id) => {
-    window.location.href = `/articles/${id}/edit`;
+    window.location.href = `/articles/new?id=${id}`;
   };
 
   handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this article?")) {
-      return;
-    }
-    
+    if (!window.confirm("Are you sure you want to delete this article?")) return;
+
     try {
       const response = await fetch(`/articles/${id}`, {
         method: "DELETE",
@@ -63,9 +65,7 @@ class ArticleList extends React.Component {
         <h2>Articles List</h2>
         {this.state.error && <p style={{ color: "red" }}>{this.state.error}</p>}
 
-        <button onClick={() => (window.location.href = "/articles/new")}>
-          Create New Article
-        </button>
+        <button onClick={this.handleCreate}>Create New Article</button>
 
         <table border="1" style={{ width: "100%", marginTop: "10px" }}>
           <thead>
