@@ -23,6 +23,8 @@ gem 'jbuilder', '~> 2.7'
 # gem 'bcrypt', '~> 3.1.7'
 gem 'react-rails', '~> 2.6', '>= 2.6.1'
 gem 'devise', '~> 4.9', '>= 4.9.4'
+gem 'kaminari'
+
 
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'

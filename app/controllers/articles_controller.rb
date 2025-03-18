@@ -3,10 +3,11 @@ class ArticlesController < ApplicationController
   before_action :set_article, only: %i[show update destroy]
 
   def index
-    @articles = Article.all
+    @articles = Article.page(params[:page]).per(5) # Paginate with 5 articles per page
+  
     respond_to do |format|
       format.html
-      format.json { render json: @articles }
+      format.json { render json: { articles: @articles, pagination: pagination_data(@articles) } }
     end
   end
 
@@ -51,4 +52,13 @@ class ArticlesController < ApplicationController
   def article_params
     params.require(:article).permit(:title, :content)
   end
+
+  def pagination_data(collection)
+    {
+      current_page: collection.current_page,
+      total_pages: collection.total_pages,
+      total_count: collection.total_count
+    }
+  end
+  
 end
